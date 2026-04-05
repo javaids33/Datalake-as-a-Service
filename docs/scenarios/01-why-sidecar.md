@@ -71,7 +71,7 @@ curl -X POST http://localhost:8765/query \
 
 There is no VPN to connect through, no service account to request, no ticket to file with a platform team. The sidecar is deployed as part of the team's own Kubernetes pod, configured with environment variables, and accessible on localhost.
 
-For teams that need access to Starburst for cross-team queries, the sidecar handles authentication transparently — JWT tokens are managed internally, TLS certificates are mounted from Kubernetes secrets, and connection pooling is automatic.
+For teams that need access to Starburst for cross-team queries, the sidecar handles authentication transparently — JWT tokens are managed internally, TLS certificates are mounted from Kubernetes secrets, and connection management is handled by DuckDB's Trino extension.
 
 ### What This Replaces
 

@@ -69,8 +69,3 @@ class TestRowFilter:
         assert RowFilterInjector(row_filter="x = 1").enabled is True
         assert RowFilterInjector(row_filter="").enabled is False
 
-    def test_starburst_session_property(self):
-        injector = RowFilterInjector(row_filter="tenant_id = 'team-alpha'")
-        prop = injector.starburst_session_property()
-        assert "SET SESSION" in prop
-        assert "query_tag" in prop

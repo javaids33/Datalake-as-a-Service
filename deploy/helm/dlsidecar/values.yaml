@@ -41,7 +41,6 @@ config:
   starburst_auth_mode: jwt
   starburst_tls_enabled: true            # CHANGE FOR STAGING/PROD
   starburst_tls_cert_path: ""
-  starburst_connection_pool_size: 10
   starburst_query_timeout: 600
 
   # HMS

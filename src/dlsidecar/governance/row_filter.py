@@ -111,11 +111,3 @@ class RowFilterInjector:
         )
         return subquery
 
-    def starburst_session_property(self) -> str | None:
-        """Return the SET SESSION statement for Starburst tenant context."""
-        if not self.enabled:
-            return None
-        import json
-
-        tag = json.dumps({"tenant": settings.tenant_id, "row_filter": self.row_filter})
-        return f"SET SESSION query_tag = '{tag}'"

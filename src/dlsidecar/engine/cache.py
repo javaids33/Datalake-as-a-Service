@@ -32,7 +32,7 @@ class QueryCache:
     def __init__(self, max_entries: int = 1000, ttl: int | None = None):
         self._cache: OrderedDict[str, CacheEntry] = OrderedDict()
         self._max_entries = max_entries
-        self._ttl = ttl or settings.starburst_results_cache_ttl
+        self._ttl = ttl or 300  # 5 min default cache TTL
 
     @staticmethod
     def _key(sql: str) -> str:
