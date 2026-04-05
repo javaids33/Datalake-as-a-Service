@@ -43,9 +43,9 @@
 
   <path d="M610,140 L690,140" fill="none" stroke="#16a34a" stroke-width="2" class="fr" marker-end="url(#ag)"/>
 
-  <rect x="690" y="115" width="130" height="50" rx="6" fill="#f0fdf4" stroke="#86efac" filter="url(#sh)"/>
-  <text x="755" y="137" text-anchor="middle" font-size="11" font-weight="600" fill="#15803d">/data/input.csv</text>
-  <text x="755" y="153" text-anchor="middle" font-size="9" fill="#16a34a">local filesystem</text>
+  <rect x="690" y="115" width="130" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0" filter="url(#sh)"/>
+  <text x="755" y="137" text-anchor="middle" font-size="11" font-weight="600" fill="#334155">/data/input.csv</text>
+  <text x="755" y="153" text-anchor="middle" font-size="9" fill="#94a3b8">app container (shared vol)</text>
 
   <path d="M690,150 L610,150" fill="none" stroke="#16a34a" stroke-width="1.5" class="fl" marker-end="url(#ag)"/>
 
@@ -79,8 +79,8 @@
   <path d="M540,275 L620,275" fill="none" stroke="#16a34a" stroke-width="2" class="fr" marker-end="url(#ag)"/>
 
   <rect x="620" y="260" width="120" height="50" rx="6" fill="#dcfce7" stroke="#16a34a" filter="url(#sh)"/>
-  <text x="680" y="282" text-anchor="middle" font-size="11" font-weight="600" fill="#15803d">S3 Bucket</text>
-  <text x="680" y="298" text-anchor="middle" font-size="9" fill="#16a34a">Iceberg files</text>
+  <text x="680" y="282" text-anchor="middle" font-size="11" font-weight="600" fill="#15803d">Team S3</text>
+  <text x="680" y="298" text-anchor="middle" font-size="9" fill="#16a34a">own catalog (direct)</text>
 
   <path d="M540,295 L620,300" fill="none" stroke="#ca8a04" stroke-width="1.5" class="fr" marker-end="url(#ay)"/>
 
@@ -142,7 +142,7 @@
   <!-- ══════════════════════════════════════════════════════════════════ -->
   <rect x="20" y="520" width="1160" height="155" rx="10" fill="#fce7f3" stroke="#f9a8d4" stroke-width="1.5"/>
   <text x="40" y="542" font-size="13" font-weight="700" fill="#9d174d">Workflow 4: Cross-team federated JOIN (payments + finance)</text>
-  <text x="40" y="558" font-size="11" fill="#be185d">payments.transactions (owned) JOIN finance.accounts (unowned). Hybrid: Starburst resolves finance, DuckDB joins locally.</text>
+  <text x="40" y="558" font-size="11" fill="#be185d">payments.* (own catalog, DuckDB direct to S3) JOIN finance.* (other team, routed to Starburst for federation)</text>
 
   <rect x="50" y="575" width="130" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0" filter="url(#sh)"/>
   <text x="115" y="597" text-anchor="middle" font-size="11" font-weight="600" fill="#334155">Data Scientist</text>
@@ -157,12 +157,12 @@
   <!-- Owned side → DuckDB -->
   <path d="M360,585 L430,575" fill="none" stroke="#16a34a" stroke-width="2" class="fr" marker-end="url(#ag)"/>
   <rect x="430" y="565" width="150" height="35" rx="6" fill="#dcfce7" stroke="#16a34a" filter="url(#sh)"/>
-  <text x="505" y="587" text-anchor="middle" font-size="10" font-weight="600" fill="#15803d">DuckDB: payments.*</text>
+  <text x="505" y="587" text-anchor="middle" font-size="10" font-weight="600" fill="#15803d">DuckDB: payments.* (S3 direct)</text>
 
   <!-- Unowned side → Starburst -->
   <path d="M360,615 L430,620" fill="none" stroke="#2563eb" stroke-width="2" class="fr" marker-end="url(#ab)"/>
   <rect x="430" y="610" width="150" height="35" rx="6" fill="#dbeafe" stroke="#2563eb" filter="url(#sh)"/>
-  <text x="505" y="632" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af">Starburst: finance.*</text>
+  <text x="505" y="632" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af">Starburst: finance.* (federated)</text>
 
   <!-- Starburst resolves -->
   <path d="M580,627 L660,627" fill="none" stroke="#2563eb" stroke-width="2.5" class="fr" marker-end="url(#ab)"/>
