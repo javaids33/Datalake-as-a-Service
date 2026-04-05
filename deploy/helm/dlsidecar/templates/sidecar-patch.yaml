@@ -1,0 +1,83 @@
+{{- /*
+  Sidecar container patch — inject dlsidecar into any pod
+  Usage: Add this as a strategic merge patch or use as a reference for your pod spec
+*/ -}}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .Release.Name }}-sidecar-ref
+  labels:
+    app: dlsidecar
+    app.kubernetes.io/name: dlsidecar
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  serviceAccountName: {{ .Values.serviceAccount.name }}
+  containers:
+    - name: dlsidecar
+      image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+      ports:
+        - name: rest
+          containerPort: {{ .Values.config.rest_port }}
+          protocol: TCP
+        - name: flight
+          containerPort: {{ .Values.config.flight_port }}
+          protocol: TCP
+        - name: metrics
+          containerPort: {{ .Values.config.metrics_port }}
+          protocol: TCP
+      envFrom:
+        - configMapRef:
+            name: {{ .Release.Name }}-config
+        {{- if .Values.secrets }}
+        - secretRef:
+            name: {{ .Release.Name }}-secrets
+        {{- end }}
+      env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+      resources:
+        {{- toYaml .Values.resources | nindent 8 }}
+      readinessProbe:
+        httpGet:
+          path: /readyz
+          port: rest
+        initialDelaySeconds: 5
+        periodSeconds: 10
+      livenessProbe:
+        httpGet:
+          path: /healthz
+          port: rest
+        initialDelaySeconds: 10
+        periodSeconds: 30
+      volumeMounts:
+        {{- if .Values.jwt.enabled }}
+        - name: jwt-token
+          mountPath: {{ .Values.jwt.mountPath }}
+          readOnly: true
+        {{- end }}
+        {{- if and .Values.persistence.enabled (eq .Values.config.duckdb_mode "persistent") }}
+        - name: duckdb-data
+          mountPath: /data
+        {{- end }}
+  volumes:
+    {{- if .Values.jwt.enabled }}
+    - name: jwt-token
+      projected:
+        sources:
+          - serviceAccountToken:
+              audience: {{ .Values.jwt.audience }}
+              path: jwt
+              expirationSeconds: 3600
+    {{- end }}
+    {{- if and .Values.persistence.enabled (eq .Values.config.duckdb_mode "persistent") }}
+    - name: duckdb-data
+      persistentVolumeClaim:
+        claimName: {{ .Release.Name }}-duckdb-pvc
+    {{- end }}

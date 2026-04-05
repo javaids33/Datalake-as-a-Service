@@ -1,0 +1,51 @@
+# Full read-write sidecar — DuckDB + Starburst + Iceberg lifecycle management
+# Usage: helm install dlsidecar ./deploy/helm/dlsidecar -f deploy/examples/full-readwrite.yaml
+
+config:
+  mode: prod
+  tenant_id: team-beta
+  owned_namespaces: team_beta_db,team_beta_staging
+  s3_buckets: team-beta-lake,team-beta-staging
+  s3_region: us-east-1
+
+  starburst_enabled: true
+  starburst_host: starburst.internal.firm.com
+  starburst_port: 8443
+  starburst_tls_enabled: true
+
+  hms_enabled: true
+  hms_uri: "thrift://hive-metastore.starburst:9083"
+
+  iceberg_enabled: true
+  iceberg_catalog_type: glue
+  iceberg_warehouse: "s3://team-beta-lake/iceberg"
+  iceberg_namespace: team_beta_db
+  iceberg_compaction_enabled: true
+  iceberg_snapshot_expiry_enabled: true
+  iceberg_orphan_cleanup_enabled: true
+  iceberg_manifest_rewrite_enabled: true
+
+  duckdb_mode: memory
+  duckdb_memory_limit: 4GB
+  duckdb_threads: 4
+
+  onboarding_ui_enabled: false
+  log_level: INFO
+
+externalSecrets:
+  enabled: true
+  secretStoreRef:
+    name: aws-secrets-manager
+    kind: ClusterSecretStore
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/team-beta-dlsidecar
+
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "4Gi"
+    cpu: "2"

@@ -1,0 +1,15 @@
+apiVersion: v2
+name: dlsidecar
+description: Data Lake as a Service — sidecar container for enterprise EKS deployments
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - data-lake
+  - duckdb
+  - iceberg
+  - starburst
+  - sidecar
+  - eks
+maintainers:
+  - name: Platform Team

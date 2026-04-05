@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Node (legacy, removed)
+node_modules/
+
+# DuckDB
+*.duckdb
+*.duckdb.wal
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Secrets — never commit
+credentials.json
+*.pem
+*.key
+
+# Build artifacts
+*.whl

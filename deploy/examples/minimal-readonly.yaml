@@ -1,0 +1,28 @@
+# Minimal read-only sidecar — DuckDB direct to team S3, no Starburst
+# Usage: helm install dlsidecar ./deploy/helm/dlsidecar -f deploy/examples/minimal-readonly.yaml
+
+config:
+  mode: prod
+  tenant_id: team-alpha
+  owned_namespaces: team_alpha_db
+  s3_buckets: team-alpha-data
+  s3_region: us-east-1
+  starburst_enabled: false
+  hms_enabled: false
+  iceberg_enabled: false
+  duckdb_mode: memory
+  duckdb_memory_limit: 2GB
+  onboarding_ui_enabled: false
+  log_level: INFO
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/team-alpha-dlsidecar
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "100m"
+  limits:
+    memory: "2Gi"
+    cpu: "1"

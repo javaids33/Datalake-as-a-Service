@@ -1,0 +1,129 @@
+# dlsidecar Helm values
+# Preset system: set `preset` to one of: minimal-readonly, full-readwrite, streaming-ingest, dev-local
+# Presets apply defaults; individual values below override them.
+
+preset: ""  # Set to apply a preset
+
+image:
+  repository: dlsidecar
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+# Sidecar resource limits
+resources:
+  requests:
+    memory: "512Mi"
+    cpu: "250m"
+  limits:
+    memory: "4Gi"
+    cpu: "2"
+
+# Core config — maps to DLS_ env vars
+config:
+  mode: dev                              # CHANGE FOR STAGING/PROD
+  tenant_id: ""
+  owned_namespaces: ""
+  row_filter: ""
+
+  # S3
+  s3_buckets: ""
+  s3_region: us-east-1                   # CHANGE FOR STAGING/PROD
+  s3_endpoint_url: ""
+  s3_path_style: false
+  bucket_config: "{}"
+
+  # Starburst
+  starburst_enabled: true
+  starburst_host: ""                     # CHANGE FOR STAGING/PROD
+  starburst_port: 8443
+  starburst_catalog: iceberg
+  starburst_schema: default
+  starburst_auth_mode: jwt
+  starburst_tls_enabled: true            # CHANGE FOR STAGING/PROD
+  starburst_tls_cert_path: ""
+  starburst_connection_pool_size: 10
+  starburst_query_timeout: 600
+
+  # HMS
+  hms_enabled: true
+  hms_uri: "thrift://hive-metastore:9083"
+  hms_database: default
+
+  # DuckDB
+  duckdb_mode: memory
+  duckdb_memory_limit: 4GB
+  duckdb_threads: 4
+  duckdb_extensions: "httpfs,iceberg,json,parquet"
+
+  # Iceberg
+  iceberg_enabled: true
+  iceberg_catalog_type: glue
+  iceberg_catalog_uri: ""
+  iceberg_warehouse: ""
+  iceberg_namespace: default
+  iceberg_target_file_size_mb: 128
+  iceberg_compaction_enabled: true
+  iceberg_compaction_cron: "0 2 * * *"
+  iceberg_snapshot_expiry_enabled: true
+  iceberg_snapshot_expiry_cron: "0 3 * * *"
+  iceberg_snapshot_min_age_hours: 168
+  iceberg_snapshot_min_count: 5
+
+  # Kafka
+  kafka_enabled: false
+  kafka_brokers: ""
+  kafka_consumer_topics: ""
+  kafka_format: json
+
+  # API
+  rest_port: 8765
+  flight_port: 8766
+  metrics_port: 9090
+
+  # Observability
+  log_level: INFO
+  enable_metrics: true
+
+  # Onboarding
+  onboarding_ui_enabled: false           # Auto-true when mode=dev
+
+# Secrets — injected via ESO, never hardcoded in values
+secrets: {}
+  # snowflake_user: ""
+  # postgres_dsn: ""
+  # motherduck_token: ""
+
+# External Secrets Operator
+externalSecrets:
+  enabled: false
+  secretStoreRef:
+    name: aws-secrets-manager
+    kind: ClusterSecretStore
+
+# Service account for IRSA
+serviceAccount:
+  create: true
+  name: dlsidecar
+  annotations: {}
+  # eks.amazonaws.com/role-arn: arn:aws:iam::ACCT:role/dlsidecar-role
+
+# Network policy
+networkPolicy:
+  enabled: true
+
+# Pod disruption budget
+pdb:
+  enabled: true
+  minAvailable: 1
+
+# JWT token volume
+jwt:
+  enabled: true
+  audience: starburst
+  mountPath: /var/run/secrets/dlsidecar
+
+# Persistent volume for DuckDB persistent mode
+persistence:
+  enabled: false
+  size: 10Gi
+  storageClass: ""

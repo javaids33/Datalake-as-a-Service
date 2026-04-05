@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 780" font-family="Inter, -apple-system, sans-serif">
+  <defs>
+    <style>
+      @keyframes flow { from { stroke-dashoffset: 16; } to { stroke-dashoffset: 0; } }
+      .anim { stroke-dasharray: 6 3; animation: flow 0.6s linear infinite; }
+    </style>
+    <filter id="s"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.12"/></filter>
+  </defs>
+
+  <rect width="950" height="780" fill="#fafbfc" rx="10"/>
+  <text x="475" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">Query Routing Decision Tree</text>
+  <text x="475" y="52" text-anchor="middle" font-size="12" fill="#64748b">DuckDB = lightweight local client | Starburst/Trino = distributed compute engine</text>
+
+  <!-- SQL Input -->
+  <rect x="370" y="70" width="210" height="40" rx="20" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" filter="url(#s)"/>
+  <text x="475" y="95" text-anchor="middle" font-size="13" font-weight="600" fill="#334155">SQL Query Arrives</text>
+
+  <!-- D1: Explicit hint? -->
+  <polygon points="475,135 575,170 475,205 375,170" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5" filter="url(#s)"/>
+  <text x="475" y="168" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">ENGINE hint?</text>
+  <text x="590" y="163" font-size="10" fill="#2563eb" font-weight="600">starburst</text>
+  <text x="348" y="163" font-size="10" fill="#64748b" font-weight="600">no</text>
+  <line x1="475" y1="110" x2="475" y2="135" stroke="#64748b" stroke-width="1.5"/>
+
+  <rect x="680" y="147" width="200" height="48" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2" filter="url(#s)"/>
+  <text x="780" y="169" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">STARBURST</text>
+  <text x="780" y="186" text-anchor="middle" font-size="10" fill="#3b82f6">explicit offload to Trino</text>
+  <line x1="575" y1="170" x2="680" y2="170" stroke="#2563eb" stroke-width="2" class="anim"/>
+
+  <!-- D2: Local file? -->
+  <polygon points="475,230 565,265 475,300 385,265" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5" filter="url(#s)"/>
+  <text x="475" y="263" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">Local file I/O?</text>
+  <text x="580" y="258" font-size="10" fill="#16a34a" font-weight="600">yes</text>
+  <text x="360" y="258" font-size="10" fill="#64748b" font-weight="600">no</text>
+  <line x1="475" y1="205" x2="475" y2="230" stroke="#64748b" stroke-width="1.5"/>
+
+  <rect x="680" y="243" width="200" height="48" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2" filter="url(#s)"/>
+  <text x="780" y="265" text-anchor="middle" font-size="12" font-weight="700" fill="#15803d">DUCKDB</text>
+  <text x="780" y="281" text-anchor="middle" font-size="10" fill="#16a34a">read_csv, read_parquet, COPY</text>
+  <line x1="565" y1="265" x2="680" y2="265" stroke="#16a34a" stroke-width="2" class="anim"/>
+
+  <!-- D3: Size > 50GB? -->
+  <polygon points="475,325 565,360 475,395 385,360" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5" filter="url(#s)"/>
+  <text x="475" y="358" text-anchor="middle" font-size="11" font-weight="600" fill="#92400e">Size > 50GB?</text>
+  <text x="580" y="353" font-size="10" fill="#dc2626" font-weight="600">too big</text>
+  <text x="360" y="353" font-size="10" fill="#64748b" font-weight="600">no</text>
+  <line x1="475" y1="300" x2="475" y2="325" stroke="#64748b" stroke-width="1.5"/>
+
+  <rect x="680" y="338" width="200" height="48" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2" filter="url(#s)"/>
+  <text x="780" y="360" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">STARBURST</text>
+  <text x="780" y="376" text-anchor="middle" font-size="10" fill="#3b82f6">distributed scan (10 workers)</text>
+  <line x1="565" y1="360" x2="680" y2="360" stroke="#2563eb" stroke-width="2" class="anim"/>
+
+  <!-- D4: Heavy compute? (the key new decision) -->
+  <polygon points="475,420 575,460 475,500 375,460" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5" filter="url(#s)"/>
+  <text x="475" y="453" text-anchor="middle" font-size="10" font-weight="600" fill="#92400e">Heavy compute?</text>
+  <text x="475" y="468" text-anchor="middle" font-size="9" fill="#92400e">GROUP BY / WINDOW / CUBE</text>
+  <text x="590" y="453" font-size="10" fill="#2563eb" font-weight="700">offload</text>
+  <text x="348" y="453" font-size="10" fill="#64748b" font-weight="600">no</text>
+  <line x1="475" y1="395" x2="475" y2="420" stroke="#64748b" stroke-width="1.5"/>
+
+  <rect x="680" y="433" width="200" height="55" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2" filter="url(#s)"/>
+  <text x="780" y="455" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">STARBURST</text>
+  <text x="780" y="472" text-anchor="middle" font-size="10" fill="#3b82f6">Trino chefs the answer</text>
+  <text x="780" y="484" text-anchor="middle" font-size="9" fill="#3b82f6">DuckDB relays result back</text>
+  <line x1="575" y1="460" x2="680" y2="460" stroke="#2563eb" stroke-width="2.5" class="anim"/>
+
+  <!-- D5: Cross-team refs? -->
+  <polygon points="475,525 575,565 475,605 375,565" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5" filter="url(#s)"/>
+  <text x="475" y="558" text-anchor="middle" font-size="10" font-weight="600" fill="#92400e">Cross-team</text>
+  <text x="475" y="573" text-anchor="middle" font-size="10" font-weight="600" fill="#92400e">references?</text>
+  <text x="590" y="555" font-size="10" fill="#7c3aed" font-weight="600">mixed</text>
+  <text x="590" y="575" font-size="10" fill="#dc2626" font-weight="600">all unowned</text>
+  <text x="340" y="558" font-size="10" fill="#16a34a" font-weight="600">owned</text>
+  <line x1="475" y1="500" x2="475" y2="525" stroke="#64748b" stroke-width="1.5"/>
+
+  <!-- Mixed → Hybrid -->
+  <rect x="680" y="530" width="200" height="48" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="2" filter="url(#s)"/>
+  <text x="780" y="552" text-anchor="middle" font-size="12" font-weight="700" fill="#5b21b6">HYBRID</text>
+  <text x="780" y="568" text-anchor="middle" font-size="10" fill="#7c3aed">Starburst + DuckDB merge</text>
+  <line x1="575" y1="555" x2="680" y2="555" stroke="#7c3aed" stroke-width="2" class="anim"/>
+
+  <!-- All unowned → Starburst -->
+  <rect x="680" y="595" width="200" height="48" rx="8" fill="#fee2e2" stroke="#dc2626" stroke-width="2" filter="url(#s)"/>
+  <text x="780" y="617" text-anchor="middle" font-size="12" font-weight="700" fill="#991b1b">STARBURST</text>
+  <text x="780" y="633" text-anchor="middle" font-size="10" fill="#dc2626">governed cross-team only</text>
+  <line x1="575" y1="575" x2="680" y2="620" stroke="#dc2626" stroke-width="2" class="anim"/>
+
+  <!-- Owned → DuckDB -->
+  <rect x="60" y="540" width="200" height="48" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2" filter="url(#s)"/>
+  <text x="160" y="562" text-anchor="middle" font-size="12" font-weight="700" fill="#15803d">DUCKDB</text>
+  <text x="160" y="578" text-anchor="middle" font-size="10" fill="#16a34a">own namespace, fast, no hop</text>
+  <line x1="375" y1="565" x2="260" y2="565" stroke="#16a34a" stroke-width="2" class="anim"/>
+
+  <!-- Summary box -->
+  <rect x="30" y="660" width="890" height="105" rx="10" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="475" y="685" text-anchor="middle" font-size="14" font-weight="700" fill="#0f172a">Why Trino/Starburst for heavy compute?</text>
+  <text x="475" y="705" text-anchor="middle" font-size="12" fill="#334155">DuckDB runs in-pod with 2-4GB memory. A GROUP BY on 500GB would OOMKill it.</text>
+  <text x="475" y="725" text-anchor="middle" font-size="12" fill="#334155">Trino distributes the scan across 10+ workers with 320GB+ aggregate memory.</text>
+  <text x="475" y="745" text-anchor="middle" font-size="12" fill="#1e40af" font-weight="600">DuckDB offloads the query, Trino chefs the answer, DuckDB relays it back and caches it.</text>
+</svg>

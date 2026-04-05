@@ -1,0 +1,53 @@
+# Streaming ingest sidecar ��� Kafka consumer with Iceberg micro-batch writes
+# Usage: helm install dlsidecar ./deploy/helm/dlsidecar -f deploy/examples/streaming-ingest.yaml
+
+config:
+  mode: prod
+  tenant_id: team-gamma
+  owned_namespaces: team_gamma_db
+  s3_buckets: team-gamma-lake
+  s3_region: us-west-2
+
+  starburst_enabled: true
+  starburst_host: starburst.internal.firm.com
+  starburst_port: 8443
+  starburst_tls_enabled: true
+
+  hms_enabled: true
+  hms_uri: "thrift://hive-metastore.starburst:9083"
+
+  iceberg_enabled: true
+  iceberg_catalog_type: glue
+  iceberg_warehouse: "s3://team-gamma-lake/iceberg"
+  iceberg_namespace: team_gamma_db
+  iceberg_compaction_enabled: true
+  iceberg_compaction_cron: "0 */4 * * *"  # More frequent for streaming
+  iceberg_target_file_size_mb: 256
+
+  kafka_enabled: true
+  kafka_brokers: "kafka-0.kafka:9092,kafka-1.kafka:9092,kafka-2.kafka:9092"
+  kafka_consumer_topics: "events.user_activity,events.transactions"
+  kafka_format: json
+  kafka_iceberg_target: team_gamma_db.events
+  kafka_flush_interval_seconds: 30
+  kafka_batch_size: 50000
+
+  duckdb_mode: memory
+  duckdb_memory_limit: 8GB
+  duckdb_threads: 4
+  stream_buffer_rows: 200000
+
+  onboarding_ui_enabled: false
+  log_level: INFO
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/team-gamma-dlsidecar
+
+resources:
+  requests:
+    memory: "1Gi"
+    cpu: "500m"
+  limits:
+    memory: "8Gi"
+    cpu: "4"

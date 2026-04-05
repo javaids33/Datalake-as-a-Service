@@ -1,0 +1,64 @@
+{{- if .Values.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ .Release.Name }}-egress
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: dlsidecar
+    app.kubernetes.io/instance: {{ .Release.Name }}
+spec:
+  podSelector:
+    matchLabels:
+      app: dlsidecar
+  policyTypes:
+    - Egress
+  egress:
+    # DNS
+    - ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+      to:
+        - namespaceSelector: {}
+    # S3 (HTTPS)
+    - ports:
+        - port: 443
+          protocol: TCP
+      to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+    {{- if .Values.config.starburst_enabled }}
+    # Starburst
+    - ports:
+        - port: {{ .Values.config.starburst_port }}
+          protocol: TCP
+      to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: starburst
+    {{- end }}
+    {{- if .Values.config.hms_enabled }}
+    # HMS
+    - ports:
+        - port: 9083
+          protocol: TCP
+      to:
+        - podSelector:
+            matchLabels:
+              app: hive-metastore
+    {{- end }}
+    {{- if .Values.config.kafka_enabled }}
+    # Kafka
+    - ports:
+        - port: 9092
+          protocol: TCP
+        - port: 9093
+          protocol: TCP
+      to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kafka
+    {{- end }}
+{{- end }}
