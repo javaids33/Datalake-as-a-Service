@@ -50,14 +50,20 @@ async def lifespan(app: FastAPI):
     registry = ConnectionRegistry()
     registry.register(s3_source)
 
-    # 5. Starburst source
+    # 5. Starburst source (attached as DuckDB Trino catalog)
     starburst_source = None
     if settings.starburst_enabled and settings.starburst_host:
         from dlsidecar.sources.starburst import StarburstSource
 
-        starburst_source = StarburstSource()
+        starburst_source = StarburstSource(duckdb_engine=duckdb_engine)
         jwt_mgr.on_refresh(starburst_source.refresh_jwt)
         registry.register(starburst_source)
+
+    # 5b. Additional DuckDB-native datasource attachments
+    if settings.postgres_enabled and settings.postgres_dsn:
+        duckdb_engine.attach_datasource("postgres", settings.postgres_dsn, "POSTGRES")
+    if settings.mysql_enabled and settings.mysql_dsn:
+        duckdb_engine.attach_datasource("mysql", settings.mysql_dsn, "MYSQL")
 
     # 6. HMS source
     hms_source = None
@@ -90,7 +96,7 @@ async def lifespan(app: FastAPI):
         iceberg_mgr.set_hms(hms_source)
         iceberg_maintenance = IcebergMaintenance()
         iceberg_maintenance.start()
-        iceberg_health = IcebergHealth(hms_source=hms_source, starburst_source=starburst_source)
+        iceberg_health = IcebergHealth(hms_source=hms_source, duckdb_engine=duckdb_engine)
 
     # 10. Streaming ingest
     from dlsidecar.streaming.ingest import IngestManager
@@ -107,7 +113,7 @@ async def lifespan(app: FastAPI):
     from dlsidecar.api import catalog, health, iceberg, push, query, sources, stream
 
     health.init(registry, duckdb_engine)
-    query.init(duckdb_engine, starburst_source, query_router, query_cache)
+    query.init(duckdb_engine, query_router, query_cache)
     push.init(iceberg_mgr, duckdb_engine)
     stream.init(ingest_mgr)
     catalog.init(registry, duckdb_engine)

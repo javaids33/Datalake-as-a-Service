@@ -46,10 +46,7 @@ ENV_VAR_ROLES: dict[str, EnvVarRole] = {
     "DLS_STARBURST_JWT_TOKEN_PATH": EnvVarRole.ENV_SPECIFIC,
     "DLS_STARBURST_TLS_ENABLED": EnvVarRole.ENV_SPECIFIC,
     "DLS_STARBURST_TLS_CERT_PATH": EnvVarRole.ENV_SPECIFIC,
-    "DLS_STARBURST_CONNECTION_POOL_SIZE": EnvVarRole.OPTIONAL,
     "DLS_STARBURST_QUERY_TIMEOUT": EnvVarRole.OPTIONAL,
-    "DLS_STARBURST_PUSHDOWN_ENABLED": EnvVarRole.OPTIONAL,
-    "DLS_STARBURST_RESULTS_CACHE_TTL": EnvVarRole.OPTIONAL,
     # HMS
     "DLS_HMS_ENABLED": EnvVarRole.FEATURE_FLAG,
     "DLS_HMS_URI": EnvVarRole.ENV_SPECIFIC,
@@ -187,10 +184,7 @@ class Settings(BaseSettings):
     starburst_jwt_token_path: str = Field(default="/var/run/secrets/dlsidecar/jwt")
     starburst_tls_enabled: bool = Field(default=True)
     starburst_tls_cert_path: str = Field(default="")
-    starburst_connection_pool_size: int = Field(default=10)
     starburst_query_timeout: int = Field(default=600)
-    starburst_pushdown_enabled: bool = Field(default=True)
-    starburst_results_cache_ttl: int = Field(default=300)
 
     # ── HMS ───────────────────────────────────────────────────────────────────
     hms_enabled: bool = Field(default=True)
@@ -204,7 +198,7 @@ class Settings(BaseSettings):
     duckdb_memory_limit: str = Field(default="4GB")
     duckdb_threads: int = Field(default=4)
     duckdb_extensions: str = Field(
-        default="httpfs,iceberg,json,parquet",
+        default="httpfs,iceberg,json,parquet,trino",
         description="Comma-separated DuckDB extensions to load at startup",
     )
     duckdb_shared_file_path: str = Field(default="/shared/result.arrow")

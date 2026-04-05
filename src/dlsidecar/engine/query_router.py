@@ -68,17 +68,17 @@ LOCAL_WORK_PATTERNS = re.compile(
 
 
 class Engine(str, Enum):
-    DUCKDB = "duckdb"          # Lightweight local engine
-    STARBURST = "starburst"    # Distributed compute engine
-    HYBRID = "hybrid"          # DuckDB orchestrates, Starburst computes parts
+    DUCKDB = "duckdb"                    # Local mode (files, team S3, local tables)
+    TRINO_FEDERATED = "trino_federated"  # DuckDB executes via attached Trino catalog
+    HYBRID = "hybrid"                    # Mix of local + federated in same query
 
 
 class JoinStrategy(str, Enum):
     NONE = "none"
     LOCAL_ONLY = "local_only"           # All data local to DuckDB
-    REMOTE_ONLY = "remote_only"         # Full pushdown to Starburst
-    HYBRID_PULL = "hybrid_pull"         # Starburst resolves remote, DuckDB joins locally
-    STARBURST_OFFLOAD = "starburst_offload"  # DuckDB offloads entire query to Starburst
+    REMOTE_ONLY = "remote_only"         # Full query via attached Trino catalog
+    HYBRID_PULL = "hybrid_pull"         # Trino resolves remote, DuckDB joins locally
+    TRINO_OFFLOAD = "trino_offload"     # DuckDB offloads entire query via Trino extension
 
 
 class RoutingReason(str, Enum):
@@ -96,21 +96,20 @@ class RoutingReason(str, Enum):
     EXPLICIT_HINT = "explicit_hint"
     CROSS_JOIN = "cross_join"
     DATA_PREP = "data_prep"             # Local file prep (CSV→Parquet, schema transform)
-    STARBURST_PUSHDOWN = "starburst_pushdown"  # DuckDB pushes to Starburst directly
+    TRINO_PUSHDOWN = "trino_pushdown"   # Query uses attached Trino catalog
 
 
 @dataclass
 class ExecutionPlan:
     engine: Engine
-    pushdown_sql: str | None = None      # SQL to send to Starburst
-    local_sql: str | None = None         # SQL to execute in DuckDB
+    local_sql: str | None = None         # SQL to execute in DuckDB (all queries go through DuckDB)
     join_strategy: JoinStrategy = JoinStrategy.NONE
     reasons: list[RoutingReason] = field(default_factory=list)
     snapshot_id: int | None = None
     as_of_timestamp: str | None = None
     tables_owned: list[str] = field(default_factory=list)
     tables_unowned: list[str] = field(default_factory=list)
-    offload_to_starburst: bool = False   # When True, DuckDB relays to Starburst
+    federated: bool = False              # When True, query uses attached Trino catalog
 
 
 @dataclass
@@ -191,12 +190,11 @@ class QueryRouter:
         # ── Decision logic (ordered by priority) ─────────────────────────
 
         # 1. Explicit engine hint overrides everything
-        if engine_hint == "starburst":
-            plan.engine = Engine.STARBURST
-            plan.pushdown_sql = sql
-            plan.local_sql = None
-            plan.offload_to_starburst = True
-            plan.join_strategy = JoinStrategy.STARBURST_OFFLOAD
+        if engine_hint == "starburst" or engine_hint == "trino":
+            plan.engine = Engine.TRINO_FEDERATED
+            plan.local_sql = sql
+            plan.federated = True
+            plan.join_strategy = JoinStrategy.TRINO_OFFLOAD
             plan.reasons.append(RoutingReason.EXPLICIT_HINT)
             self._emit_routing(plan)
             return plan
@@ -226,25 +224,23 @@ class QueryRouter:
             self._emit_routing(plan)
             return plan
 
-        # 4. Size threshold → offload to Starburst (too big for in-memory DuckDB)
+        # 4. Size threshold → federate via Trino (too big for in-memory DuckDB)
         if estimated_bytes and estimated_bytes > self.scan_threshold:
-            plan.engine = Engine.STARBURST
-            plan.pushdown_sql = sql
-            plan.local_sql = None
-            plan.offload_to_starburst = True
-            plan.join_strategy = JoinStrategy.STARBURST_OFFLOAD
+            plan.engine = Engine.TRINO_FEDERATED
+            plan.local_sql = sql
+            plan.federated = True
+            plan.join_strategy = JoinStrategy.TRINO_OFFLOAD
             plan.reasons.append(RoutingReason.SIZE_THRESHOLD)
             self._emit_routing(plan)
             return plan
 
-        # 5. Heavy compute on non-local data → offload to Starburst
-        #    DuckDB is lightweight; Starburst has the distributed muscle
+        # 5. Heavy compute on non-local data → federate via Trino
+        #    DuckDB is lightweight; Trino/Starburst has the distributed muscle
         if self._is_heavy_compute(sql) and not self._all_local_files(table_refs) and settings.starburst_enabled:
-            plan.engine = Engine.STARBURST
-            plan.pushdown_sql = sql
-            plan.local_sql = None
-            plan.offload_to_starburst = True
-            plan.join_strategy = JoinStrategy.STARBURST_OFFLOAD
+            plan.engine = Engine.TRINO_FEDERATED
+            plan.local_sql = sql
+            plan.federated = True
+            plan.join_strategy = JoinStrategy.TRINO_OFFLOAD
             plan.reasons.append(RoutingReason.HEAVY_COMPUTE)
             self._emit_routing(plan)
             return plan
@@ -257,24 +253,23 @@ class QueryRouter:
             self._emit_routing(plan)
             return plan
 
-        # 7. All tables unowned → Starburst gateway (governed, cross-team)
+        # 7. All tables unowned → federate via attached Trino catalog (governed)
         if unowned and not owned:
-            plan.engine = Engine.STARBURST
-            plan.pushdown_sql = sql
-            plan.local_sql = None
-            plan.offload_to_starburst = True
+            plan.engine = Engine.TRINO_FEDERATED
+            plan.local_sql = sql
+            plan.federated = True
             plan.join_strategy = JoinStrategy.REMOTE_ONLY
             plan.reasons.append(RoutingReason.CROSS_TEAM_REF)
             self._emit_routing(plan)
             return plan
 
         # 8. Mix of owned and unowned → Hybrid
-        #    Starburst resolves unowned side, DuckDB joins with local data
+        #    DuckDB executes the full query; Trino extension resolves unowned tables
         if owned and unowned:
             plan.engine = Engine.HYBRID
             plan.join_strategy = JoinStrategy.HYBRID_PULL
+            plan.federated = True
             plan.reasons.append(RoutingReason.CROSS_JOIN)
-            plan.pushdown_sql = self._build_unowned_subquery(clean_sql, unowned)
             plan.local_sql = sql
             self._emit_routing(plan)
             return plan
@@ -404,10 +399,6 @@ class QueryRouter:
         """Check if all table refs are local files."""
         return all(r.is_local_file or r.is_local for r in refs)
 
-    def _build_unowned_subquery(self, sql: str, unowned: list[TableRef]) -> str:
-        """Build the SQL fragment that Starburst needs to resolve for unowned tables."""
-        return sql
-
     def _extract_engine_hint(self, sql: str) -> str | None:
         m = ENGINE_HINT_RE.search(sql)
         return m.group(1).lower() if m else None
@@ -431,10 +422,10 @@ class QueryRouter:
         reason_str = ",".join(r.value for r in plan.reasons) if plan.reasons else "unknown"
         ROUTING_DECISIONS.labels(path=plan.engine.value, reason=reason_str).inc()
         logger.info(
-            "Routed to %s: reasons=%s owned=%s unowned=%s offload=%s",
+            "Routed to %s: reasons=%s owned=%s unowned=%s federated=%s",
             plan.engine.value,
             reason_str,
             plan.tables_owned,
             plan.tables_unowned,
-            plan.offload_to_starburst,
+            plan.federated,
         )

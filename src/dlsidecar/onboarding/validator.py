@@ -33,20 +33,26 @@ async def validate_s3(bucket: str, region: str = "us-east-1", endpoint_url: str 
 
 
 async def validate_starburst(host: str, port: int = 8443, auth_mode: str = "jwt", jwt_token: str = "") -> dict[str, Any]:
-    """Test Starburst connectivity."""
+    """Test Starburst connectivity via DuckDB's Trino extension."""
     try:
-        import trino
+        import duckdb
 
-        kwargs: dict[str, Any] = {"host": host, "port": port, "http_scheme": "https"}
+        conn = duckdb.connect(":memory:")
+        conn.execute("INSTALL trino")
+        conn.execute("LOAD trino")
+
+        params = [f"HOST '{host}'", f"PORT {port}"]
         if auth_mode == "jwt" and jwt_token:
-            kwargs["auth"] = trino.auth.JWTAuthentication(jwt_token)
+            params.append(f"TOKEN '{jwt_token}'")
+        params.append("USE_TLS true")
 
-        conn = trino.dbapi.connect(**kwargs)
+        attach_sql = f"ATTACH '' AS test_starburst (TYPE TRINO, {', '.join(params)})"
+
         start = time.monotonic()
-        cursor = conn.cursor()
-        cursor.execute("SELECT 1")
-        cursor.fetchone()
+        conn.execute(attach_sql)
+        conn.execute("SELECT 1 FROM test_starburst.information_schema.tables LIMIT 1")
         latency = (time.monotonic() - start) * 1000
+        conn.execute("DETACH test_starburst")
         conn.close()
         return {"healthy": True, "latency_ms": round(latency, 2), "error": None}
     except Exception as exc:

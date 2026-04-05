@@ -1,203 +1,161 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 850" font-family="Inter, -apple-system, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 780" font-family="Inter, -apple-system, sans-serif">
   <defs>
     <style>
       @keyframes flowR { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
       @keyframes flowL { from { stroke-dashoffset: 0; } to { stroke-dashoffset: 24; } }
-      @keyframes pulse { 0%,100% { opacity:0.4; } 50% { opacity:1; } }
       .fr { stroke-dasharray: 8 4; animation: flowR 0.7s linear infinite; }
       .fl { stroke-dasharray: 8 4; animation: flowL 0.7s linear infinite; }
-      .pulse { animation: pulse 2s ease-in-out infinite; }
     </style>
     <filter id="sh"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.12"/></filter>
     <marker id="ag" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#16a34a"/></marker>
     <marker id="ab" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#2563eb"/></marker>
-    <marker id="ap" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#7c3aed"/></marker>
-    <marker id="ar" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#dc2626"/></marker>
-    <marker id="ay" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#ca8a04"/></marker>
     <marker id="agr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#64748b"/></marker>
   </defs>
 
-  <rect width="1200" height="850" fill="#fafbfc" rx="12"/>
-
-  <!-- Title -->
-  <text x="600" y="35" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">dlsidecar Architecture — DuckDB Client + Starburst/Trino Distributed Compute</text>
-  <text x="600" y="56" text-anchor="middle" font-size="12" fill="#64748b">DuckDB handles lightweight pod work. Starburst/Trino handles heavy compute, federation, and cross-team governance.</text>
+  <rect width="1200" height="780" fill="#fafbfc" rx="12"/>
+  <text x="600" y="35" text-anchor="middle" font-size="20" font-weight="700" fill="#0f172a">dlsidecar Architecture</text>
+  <text x="600" y="56" text-anchor="middle" font-size="12" fill="#64748b">DuckDB is the single engine. Starburst is an attached catalog via the Trino extension. No separate client.</text>
 
   <!-- ═══ EKS Pod ═══ -->
-  <rect x="25" y="75" width="530" height="680" rx="12" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8 4"/>
-  <text x="45" y="97" font-size="13" font-weight="600" fill="#64748b">EKS Pod (team-alpha)</text>
+  <rect x="25" y="75" width="500" height="600" rx="12" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-dasharray="8 4"/>
+  <text x="45" y="97" font-size="13" font-weight="600" fill="#64748b">EKS Pod (team)</text>
 
   <!-- App container -->
-  <rect x="55" y="112" width="220" height="65" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" filter="url(#sh)"/>
-  <text x="165" y="138" text-anchor="middle" font-size="14" font-weight="600" fill="#334155">App Container</text>
-  <text x="165" y="158" text-anchor="middle" font-size="11" fill="#94a3b8">POST localhost:8765/query</text>
+  <rect x="55" y="112" width="200" height="55" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" filter="url(#sh)"/>
+  <text x="155" y="137" text-anchor="middle" font-size="13" font-weight="600" fill="#334155">App Container</text>
+  <text x="155" y="155" text-anchor="middle" font-size="11" fill="#94a3b8">POST localhost:8765/query</text>
 
   <!-- dlsidecar boundary -->
-  <rect x="40" y="195" width="505" height="540" rx="10" fill="#f0f9ff" stroke="#bfdbfe" stroke-width="1.5" stroke-dasharray="6 3"/>
-  <text x="60" y="217" font-size="12" font-weight="600" fill="#3b82f6">dlsidecar container</text>
+  <rect x="40" y="185" width="475" height="470" rx="10" fill="#f0f9ff" stroke="#bfdbfe" stroke-width="1.5" stroke-dasharray="6 3"/>
+  <text x="60" y="207" font-size="12" font-weight="600" fill="#3b82f6">dlsidecar container</text>
 
   <!-- Query Router -->
-  <rect x="80" y="235" width="220" height="70" rx="8" fill="#ede9fe" stroke="#a78bfa" stroke-width="2" filter="url(#sh)"/>
-  <text x="190" y="262" text-anchor="middle" font-size="14" font-weight="700" fill="#5b21b6">Query Router</text>
-  <text x="190" y="282" text-anchor="middle" font-size="11" fill="#7c3aed">sqlglot AST + cost estimation</text>
+  <rect x="80" y="225" width="200" height="60" rx="8" fill="#ede9fe" stroke="#a78bfa" stroke-width="2" filter="url(#sh)"/>
+  <text x="180" y="252" text-anchor="middle" font-size="14" font-weight="700" fill="#5b21b6">Query Router</text>
+  <text x="180" y="270" text-anchor="middle" font-size="11" fill="#7c3aed">sqlglot AST analysis</text>
 
-  <!-- DuckDB -->
-  <rect x="60" y="345" width="200" height="100" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2" filter="url(#sh)"/>
-  <text x="160" y="373" text-anchor="middle" font-size="15" font-weight="700" fill="#15803d">DuckDB</text>
-  <text x="160" y="393" text-anchor="middle" font-size="11" fill="#16a34a">lightweight in-memory OLAP</text>
-  <text x="160" y="408" text-anchor="middle" font-size="10" fill="#16a34a">local files, data prep, caching</text>
-  <text x="160" y="423" text-anchor="middle" font-size="10" fill="#16a34a">small scans, format conversion</text>
+  <!-- DuckDB — THE single engine, with Trino extension inside -->
+  <rect x="60" y="320" width="440" height="120" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2.5" filter="url(#sh)"/>
+  <text x="280" y="348" text-anchor="middle" font-size="16" font-weight="700" fill="#15803d">DuckDB — single query engine</text>
 
-  <!-- Starburst client -->
-  <rect x="300" y="345" width="230" height="100" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2" filter="url(#sh)"/>
-  <text x="415" y="373" text-anchor="middle" font-size="14" font-weight="700" fill="#1e40af">Starburst Client</text>
-  <text x="415" y="393" text-anchor="middle" font-size="11" fill="#2563eb">JWT + Trino wire protocol</text>
-  <text x="415" y="408" text-anchor="middle" font-size="10" fill="#2563eb">offloads heavy queries</text>
-  <text x="415" y="423" text-anchor="middle" font-size="10" fill="#2563eb">relays results back to DuckDB</text>
+  <!-- Internal capabilities -->
+  <rect x="80" y="360" width="120" height="35" rx="5" fill="#bbf7d0" stroke="#4ade80"/>
+  <text x="140" y="382" text-anchor="middle" font-size="10" font-weight="600" fill="#166534">Local OLAP</text>
 
-  <!-- DuckDB → Starburst offload arrow (the key relationship) -->
-  <path d="M260,375 L300,375" fill="none" stroke="#7c3aed" stroke-width="3" class="fr" marker-end="url(#ap)"/>
-  <text x="278" y="367" text-anchor="middle" font-size="9" font-weight="700" fill="#7c3aed">offload</text>
-  <!-- Starburst → DuckDB results relay -->
-  <path d="M300,415 L260,415" fill="none" stroke="#7c3aed" stroke-width="2.5" class="fl" marker-end="url(#ap)"/>
-  <text x="278" y="432" text-anchor="middle" font-size="9" font-weight="600" fill="#7c3aed">results</text>
+  <rect x="210" y="360" width="120" height="35" rx="5" fill="#bbf7d0" stroke="#4ade80"/>
+  <text x="270" y="382" text-anchor="middle" font-size="10" font-weight="600" fill="#166534">httpfs (S3)</text>
+
+  <rect x="340" y="360" width="140" height="35" rx="5" fill="#bfdbfe" stroke="#60a5fa" stroke-width="1.5"/>
+  <text x="410" y="377" text-anchor="middle" font-size="10" font-weight="700" fill="#1e40af">Trino extension</text>
+  <text x="410" y="390" text-anchor="middle" font-size="9" fill="#3b82f6">ATTACH TYPE TRINO</text>
+
+  <text x="280" y="425" text-anchor="middle" font-size="10" fill="#16a34a">+ iceberg, json, parquet, postgres, mysql extensions</text>
 
   <!-- Iceberg Manager -->
-  <rect x="100" y="475" width="170" height="50" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5" filter="url(#sh)"/>
-  <text x="185" y="497" text-anchor="middle" font-size="12" font-weight="600" fill="#854d0e">Iceberg Manager</text>
-  <text x="185" y="513" text-anchor="middle" font-size="10" fill="#92400e">write, compact, expire</text>
+  <rect x="80" y="470" width="160" height="45" rx="8" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5" filter="url(#sh)"/>
+  <text x="160" y="497" text-anchor="middle" font-size="12" font-weight="600" fill="#854d0e">Iceberg Manager</text>
 
-  <!-- Flight + REST -->
-  <rect x="60" y="555" width="130" height="45" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" filter="url(#sh)"/>
-  <text x="125" y="575" text-anchor="middle" font-size="11" font-weight="600" fill="#475569">Flight + REST</text>
-  <text x="125" y="590" text-anchor="middle" font-size="10" fill="#94a3b8">:8765 / :8766</text>
+  <!-- REST / Flight -->
+  <rect x="260" y="470" width="110" height="45" rx="8" fill="#f8fafc" stroke="#e2e8f0" filter="url(#sh)"/>
+  <text x="315" y="497" text-anchor="middle" font-size="11" font-weight="600" fill="#475569">REST + Flight</text>
 
-  <!-- HMS client -->
-  <rect x="210" y="555" width="130" height="45" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1.5" filter="url(#sh)"/>
-  <text x="275" y="575" text-anchor="middle" font-size="11" font-weight="600" fill="#475569">HMS Client</text>
-  <text x="275" y="590" text-anchor="middle" font-size="10" fill="#94a3b8">auto-register</text>
+  <!-- Preflight -->
+  <rect x="390" y="470" width="110" height="45" rx="8" fill="#f0fdf4" stroke="#86efac" filter="url(#sh)"/>
+  <text x="445" y="497" text-anchor="middle" font-size="11" font-weight="600" fill="#15803d">Preflight</text>
+
+  <!-- JWT -->
+  <rect x="60" y="540" width="440" height="35" rx="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+  <text x="280" y="563" text-anchor="middle" font-size="11" font-weight="600" fill="#854d0e">JWT Manager — reads K8s projected SA token</text>
 
   <!-- Stream Ingest -->
-  <rect x="360" y="555" width="130" height="45" rx="8" fill="#fce7f3" stroke="#ec4899" stroke-width="1.5" filter="url(#sh)"/>
-  <text x="425" y="575" text-anchor="middle" font-size="11" font-weight="600" fill="#9d174d">Stream Ingest</text>
-  <text x="425" y="590" text-anchor="middle" font-size="10" fill="#be185d">Kafka, Arrow</text>
-
-  <!-- Preflight Checker -->
-  <rect x="60" y="625" width="170" height="40" rx="8" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5" filter="url(#sh)"/>
-  <text x="145" y="650" text-anchor="middle" font-size="11" font-weight="600" fill="#15803d">Preflight Checker</text>
-
-  <!-- JWT manager -->
-  <rect x="60" y="685" width="430" height="40" rx="8" fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5" filter="url(#sh)"/>
-  <text x="275" y="710" text-anchor="middle" font-size="11" font-weight="600" fill="#854d0e">JWT Manager — reads K8s projected SA token, auto-refreshes</text>
+  <rect x="60" y="595" width="200" height="35" rx="8" fill="#fce7f3" stroke="#ec4899" filter="url(#sh)"/>
+  <text x="160" y="617" text-anchor="middle" font-size="11" font-weight="600" fill="#9d174d">Stream Ingest + Kafka Bridge</text>
 
   <!-- ═══ Right side: External services ═══ -->
 
-  <!-- Starburst Enterprise cluster -->
-  <rect x="610" y="80" width="560" height="200" rx="12" fill="#eff6ff" stroke="#93c5fd" stroke-width="2" filter="url(#sh)"/>
-  <text x="890" y="108" text-anchor="middle" font-size="17" font-weight="700" fill="#1e40af">Starburst / Trino Enterprise</text>
-  <text x="890" y="128" text-anchor="middle" font-size="12" fill="#3b82f6">shared distributed compute cluster — this is where the heavy lifting happens</text>
+  <!-- Starburst Enterprise -->
+  <rect x="600" y="80" width="570" height="180" rx="12" fill="#eff6ff" stroke="#93c5fd" stroke-width="2" filter="url(#sh)"/>
+  <text x="885" y="108" text-anchor="middle" font-size="17" font-weight="700" fill="#1e40af">Starburst / Trino Cluster</text>
+  <text x="885" y="128" text-anchor="middle" font-size="12" fill="#3b82f6">shared distributed compute — DuckDB connects directly via Trino extension</text>
 
-  <!-- Coordinator -->
-  <rect x="640" y="145" width="170" height="55" rx="6" fill="#bfdbfe" stroke="#60a5fa" stroke-width="1.5"/>
-  <text x="725" y="168" text-anchor="middle" font-size="12" font-weight="600" fill="#1e40af">Coordinator</text>
-  <text x="725" y="185" text-anchor="middle" font-size="10" fill="#3b82f6">query planning, optimization</text>
+  <rect x="625" y="145" width="120" height="45" rx="6" fill="#bfdbfe" stroke="#60a5fa"/>
+  <text x="685" y="168" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Coordinator</text>
+  <text x="685" y="182" text-anchor="middle" font-size="9" fill="#3b82f6">plan + optimize</text>
 
-  <!-- Workers -->
-  <rect x="835" y="145" width="130" height="55" rx="6" fill="#bfdbfe" stroke="#60a5fa" stroke-width="1.5"/>
-  <text x="900" y="168" text-anchor="middle" font-size="12" font-weight="600" fill="#1e40af">Workers</text>
-  <text x="900" y="185" text-anchor="middle" font-size="10" fill="#3b82f6">distributed scan/join</text>
+  <rect x="760" y="145" width="100" height="45" rx="6" fill="#bfdbfe" stroke="#60a5fa"/>
+  <text x="810" y="168" text-anchor="middle" font-size="11" font-weight="600" fill="#1e40af">Workers</text>
+  <text x="810" y="182" text-anchor="middle" font-size="9" fill="#3b82f6">distributed</text>
 
-  <!-- Catalogs inside Starburst -->
-  <rect x="640" y="215" width="100" height="45" rx="5" fill="#dbeafe" stroke="#93c5fd"/>
-  <text x="690" y="235" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af">HMS / Glue</text>
-  <text x="690" y="250" text-anchor="middle" font-size="9" fill="#3b82f6">catalog</text>
-  <rect x="755" y="215" width="100" height="45" rx="5" fill="#dbeafe" stroke="#93c5fd"/>
-  <text x="805" y="235" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af">All Buckets</text>
-  <text x="805" y="250" text-anchor="middle" font-size="9" fill="#3b82f6">S3 connector</text>
-  <rect x="870" y="215" width="100" height="45" rx="5" fill="#dbeafe" stroke="#93c5fd"/>
-  <text x="920" y="235" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af">JDBC</text>
-  <text x="920" y="250" text-anchor="middle" font-size="9" fill="#3b82f6">Postgres, MySQL</text>
-  <rect x="985" y="215" width="160" height="45" rx="5" fill="#dbeafe" stroke="#93c5fd"/>
-  <text x="1065" y="235" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af">Other Teams</text>
-  <text x="1065" y="250" text-anchor="middle" font-size="9" fill="#3b82f6">governed namespaces</text>
+  <rect x="875" y="145" width="120" height="45" rx="6" fill="#dbeafe" stroke="#93c5fd"/>
+  <text x="935" y="168" text-anchor="middle" font-size="10" font-weight="600" fill="#1e40af">All Catalogs</text>
+  <text x="935" y="182" text-anchor="middle" font-size="9" fill="#3b82f6">S3, JDBC, HMS</text>
 
-  <!-- Team S3 bucket -->
-  <rect x="640" y="320" width="300" height="65" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2" filter="url(#sh)"/>
-  <text x="790" y="348" text-anchor="middle" font-size="14" font-weight="700" fill="#15803d">Team S3 Bucket</text>
-  <text x="790" y="367" text-anchor="middle" font-size="11" fill="#16a34a">DuckDB direct via IRSA (no Starburst hop, max speed)</text>
+  <rect x="1010" y="145" width="140" height="45" rx="6" fill="#fee2e2" stroke="#fca5a5"/>
+  <text x="1080" y="168" text-anchor="middle" font-size="10" font-weight="600" fill="#991b1b">Other Teams</text>
+  <text x="1080" y="182" text-anchor="middle" font-size="9" fill="#dc2626">governed access</text>
 
-  <!-- Iceberg tables -->
-  <rect x="640" y="410" width="300" height="65" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2" filter="url(#sh)"/>
-  <text x="790" y="438" text-anchor="middle" font-size="14" font-weight="700" fill="#15803d">Iceberg Tables</text>
-  <text x="790" y="457" text-anchor="middle" font-size="11" fill="#16a34a">compaction, snapshots, HMS registered</text>
+  <!-- Team S3 -->
+  <rect x="630" y="310" width="280" height="60" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2" filter="url(#sh)"/>
+  <text x="770" y="337" text-anchor="middle" font-size="14" font-weight="700" fill="#15803d">Team S3 Bucket</text>
+  <text x="770" y="355" text-anchor="middle" font-size="11" fill="#16a34a">DuckDB direct via IRSA (fast) + Starburst catalog (governed)</text>
 
-  <!-- Other teams' data -->
-  <rect x="640" y="510" width="300" height="65" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5" filter="url(#sh)"/>
-  <text x="790" y="538" text-anchor="middle" font-size="14" font-weight="700" fill="#991b1b">Other Teams' Data</text>
-  <text x="790" y="557" text-anchor="middle" font-size="11" fill="#dc2626">governed access via Starburst only</text>
+  <!-- Iceberg -->
+  <rect x="630" y="395" width="280" height="55" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2" filter="url(#sh)"/>
+  <text x="770" y="420" text-anchor="middle" font-size="13" font-weight="700" fill="#15803d">Iceberg Tables</text>
+  <text x="770" y="438" text-anchor="middle" font-size="11" fill="#16a34a">compaction, snapshots, HMS reg.</text>
+
+  <!-- Other teams data -->
+  <rect x="630" y="480" width="280" height="55" rx="10" fill="#fee2e2" stroke="#dc2626" stroke-width="1.5" filter="url(#sh)"/>
+  <text x="770" y="505" text-anchor="middle" font-size="13" font-weight="700" fill="#991b1b">Other Teams' Data</text>
+  <text x="770" y="523" text-anchor="middle" font-size="11" fill="#dc2626">governed via Starburst only</text>
 
   <!-- Local files -->
-  <rect x="990" y="320" width="170" height="65" rx="10" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5" filter="url(#sh)"/>
-  <text x="1075" y="348" text-anchor="middle" font-size="12" font-weight="600" fill="#15803d">Local Files</text>
-  <text x="1075" y="365" text-anchor="middle" font-size="10" fill="#16a34a">CSV, Parquet, Arrow</text>
+  <rect x="960" y="310" width="170" height="60" rx="10" fill="#f0fdf4" stroke="#86efac" filter="url(#sh)"/>
+  <text x="1045" y="337" text-anchor="middle" font-size="12" font-weight="600" fill="#15803d">Local Files</text>
+  <text x="1045" y="355" text-anchor="middle" font-size="10" fill="#16a34a">CSV, Parquet, Arrow</text>
 
   <!-- Kafka -->
-  <rect x="990" y="410" width="170" height="65" rx="10" fill="#fef9c3" stroke="#fcd34d" stroke-width="1.5" filter="url(#sh)"/>
-  <text x="1075" y="438" text-anchor="middle" font-size="12" font-weight="600" fill="#854d0e">Kafka</text>
-  <text x="1075" y="455" text-anchor="middle" font-size="10" fill="#92400e">streaming events</text>
+  <rect x="960" y="395" width="170" height="55" rx="10" fill="#fef9c3" stroke="#fcd34d" filter="url(#sh)"/>
+  <text x="1045" y="420" text-anchor="middle" font-size="12" font-weight="600" fill="#854d0e">Kafka</text>
+  <text x="1045" y="438" text-anchor="middle" font-size="10" fill="#92400e">streaming events</text>
 
-  <!-- ═══ Animated arrows ═══ -->
+  <!-- ═══ Arrows ═══ -->
 
-  <!-- App → Query Router -->
-  <line x1="165" y1="177" x2="165" y2="235" stroke="#64748b" stroke-width="1.5" marker-end="url(#agr)"/>
-  <text x="185" y="210" font-size="10" fill="#94a3b8">localhost</text>
+  <!-- App → Router -->
+  <line x1="155" y1="167" x2="155" y2="225" stroke="#64748b" stroke-width="1.5" marker-end="url(#agr)"/>
+  <text x="175" y="200" font-size="10" fill="#94a3b8">localhost</text>
 
   <!-- Router → DuckDB -->
-  <line x1="150" y1="305" x2="140" y2="345" stroke="#16a34a" stroke-width="2" marker-end="url(#ag)"/>
-  <text x="110" y="325" font-size="9" font-weight="600" fill="#16a34a">local</text>
+  <line x1="180" y1="285" x2="180" y2="320" stroke="#16a34a" stroke-width="2" marker-end="url(#ag)"/>
 
-  <!-- Router → Starburst Client -->
-  <line x1="250" y1="275" x2="340" y2="345" stroke="#2563eb" stroke-width="2" marker-end="url(#ab)"/>
-  <text x="310" y="300" font-size="9" font-weight="600" fill="#1e40af">heavy/cross-team</text>
+  <!-- DuckDB Trino ext → Starburst Enterprise (the main highway — DIRECT, no client) -->
+  <path d="M500,375 L600,160" fill="none" stroke="#2563eb" stroke-width="4" class="fr" marker-end="url(#ab)"/>
+  <text x="540" y="250" font-size="11" font-weight="700" fill="#1e40af">Trino extension</text>
+  <text x="540" y="265" font-size="10" fill="#3b82f6">ATTACH TYPE TRINO</text>
 
-  <!-- DuckDB → Team S3 (direct, green, animated) -->
-  <path d="M260,370 L640,350" fill="none" stroke="#16a34a" stroke-width="2.5" class="fr" marker-end="url(#ag)"/>
-  <text x="450" y="348" font-size="10" font-weight="600" fill="#16a34a">httpfs + IRSA (direct, fast)</text>
+  <!-- Results back from Starburst -->
+  <path d="M625,185 L500,390" fill="none" stroke="#2563eb" stroke-width="2.5" class="fl" marker-end="url(#ab)"/>
+  <text x="545" y="310" font-size="9" fill="#3b82f6">results</text>
+
+  <!-- DuckDB httpfs → Team S3 (green, direct) -->
+  <path d="M500,360 L630,340" fill="none" stroke="#16a34a" stroke-width="2.5" class="fr" marker-end="url(#ag)"/>
+  <text x="560" y="340" font-size="10" font-weight="600" fill="#16a34a">httpfs IRSA</text>
 
   <!-- DuckDB → Iceberg -->
-  <path d="M260,410 L640,440" fill="none" stroke="#16a34a" stroke-width="2" class="fr" marker-end="url(#ag)"/>
+  <path d="M500,400 L630,420" fill="none" stroke="#16a34a" stroke-width="1.5" class="fr" marker-end="url(#ag)"/>
 
   <!-- DuckDB → Local files -->
-  <path d="M260,380 L990,350" fill="none" stroke="#16a34a" stroke-width="1.5" class="fr" marker-end="url(#ag)"/>
-  <text x="700" y="378" font-size="9" fill="#16a34a">read_csv, read_parquet</text>
+  <path d="M500,365 L960,340" fill="none" stroke="#16a34a" stroke-width="1.5" class="fr" marker-end="url(#ag)"/>
 
-  <!-- Starburst client → Enterprise cluster (blue, animated, THICK — this is the compute highway) -->
-  <path d="M530,370 L610,170" fill="none" stroke="#2563eb" stroke-width="3.5" class="fr" marker-end="url(#ab)"/>
-  <text x="560" y="260" font-size="11" font-weight="700" fill="#1e40af">JWT/TLS</text>
-  <text x="560" y="275" font-size="10" fill="#2563eb">offload query</text>
-
-  <!-- Enterprise → Starburst client (results flowing back) -->
-  <path d="M635" y1="195" x2="530" y2="400" fill="none" stroke="#2563eb" stroke-width="2.5" class="fl" marker-end="url(#ab)"/>
-
-  <!-- Starburst Enterprise → Other teams data -->
-  <path d="M790,280 L790,510" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4 3" marker-end="url(#ar)"/>
-  <text x="810" y="500" font-size="9" fill="#dc2626">governed</text>
-
-  <!-- Kafka → Stream Ingest -->
-  <path d="M990,442 L490,575" fill="none" stroke="#ec4899" stroke-width="2" class="fr"/>
-  <text x="750" y="515" font-size="9" fill="#9d174d">consume events</text>
+  <!-- Starburst → Other teams (governed) -->
+  <path d="M770,260 L770,480" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4 3"/>
 
   <!-- ═══ Legend ═══ -->
-  <rect x="25" y="775" width="1150" height="60" rx="8" fill="#f1f5f9"/>
-  <line x1="55" y1="805" x2="115" y2="805" stroke="#16a34a" stroke-width="2.5" stroke-dasharray="8 4"/>
-  <text x="125" y="809" font-size="11" fill="#15803d">DuckDB direct (local files, own S3, lightweight)</text>
-
-  <line x1="400" y1="805" x2="460" y2="805" stroke="#2563eb" stroke-width="3"/>
-  <text x="470" y="809" font-size="11" fill="#1e40af">Starburst/Trino compute (heavy analytics, federation)</text>
-
-  <line x1="780" y1="805" x2="840" y2="805" stroke="#7c3aed" stroke-width="2.5"/>
-  <text x="850" y="809" font-size="11" fill="#5b21b6">DuckDB offload/relay</text>
-
-  <rect x="1020" y="798" width="14" height="14" rx="3" fill="#fee2e2" stroke="#dc2626"/>
-  <text x="1040" y="809" font-size="11" fill="#991b1b">governed only</text>
+  <rect x="25" y="700" width="1150" height="60" rx="8" fill="#f1f5f9"/>
+  <line x1="55" y1="730" x2="115" y2="730" stroke="#16a34a" stroke-width="2.5" stroke-dasharray="8 4"/>
+  <text x="125" y="734" font-size="11" fill="#15803d">DuckDB local (files, own S3, lightweight)</text>
+  <line x1="400" y1="730" x2="460" y2="730" stroke="#2563eb" stroke-width="4"/>
+  <text x="470" y="734" font-size="11" fill="#1e40af">DuckDB Trino extension to Starburst (heavy compute, federation)</text>
+  <rect x="850" y="723" width="14" height="14" rx="3" fill="#fee2e2" stroke="#dc2626"/>
+  <text x="870" y="734" font-size="11" fill="#991b1b">governed (Starburst only)</text>
 </svg>

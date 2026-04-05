@@ -24,7 +24,6 @@ router = APIRouter()
 
 # Initialized at startup
 _duckdb = None
-_starburst = None
 _router = None
 _cache = None
 _row_filter = None
@@ -33,10 +32,9 @@ _row_filter = None
 _async_jobs: dict[str, dict[str, Any]] = {}
 
 
-def init(duckdb_engine, starburst_source, query_router: QueryRouter, cache: QueryCache):
-    global _duckdb, _starburst, _router, _cache, _row_filter
+def init(duckdb_engine, query_router: QueryRouter, cache: QueryCache):
+    global _duckdb, _router, _cache, _row_filter
     _duckdb = duckdb_engine
-    _starburst = starburst_source
     _router = query_router
     _cache = cache
     _row_filter = RowFilterInjector()
@@ -68,45 +66,22 @@ async def query(req: QueryRequest, request: Request):
     # Route the query
     plan = _router.route(req.sql)
 
-    # Apply row filter for DuckDB queries
+    # Apply row filter for local queries
     sql = req.sql
     if plan.engine in (Engine.DUCKDB, Engine.HYBRID) and _row_filter and _row_filter.enabled:
         sql = _row_filter.inject(sql)
 
     start = time.monotonic()
 
-    if plan.engine == Engine.DUCKDB:
-        result = _duckdb.execute(
-            sql,
-            req.params,
-            tables_accessed=plan.tables_owned,
-            engine_routed_reason=",".join(r.value for r in plan.reasons),
-        )
-        arrow_table = result.arrow()
-    elif plan.engine == Engine.STARBURST:
-        rows = _starburst.execute_query(sql) if _starburst else []
-        # Convert to response format
-        duration_ms = (time.monotonic() - start) * 1000
-        resp = {
-            "rows": [list(r) for r in rows],
-            "row_count": len(rows),
-            "engine": "starburst",
-            "duration_ms": round(duration_ms, 2),
-            "routing_reason": ",".join(r.value for r in plan.reasons),
-        }
-        if _cache:
-            _cache.put(req.sql, resp)
-        return resp
-    else:
-        # Hybrid: execute on DuckDB (which will pull from Starburst for unowned)
-        result = _duckdb.execute(
-            sql,
-            req.params,
-            engine_label="hybrid",
-            tables_accessed=plan.tables_owned + plan.tables_unowned,
-            engine_routed_reason=",".join(r.value for r in plan.reasons),
-        )
-        arrow_table = result.arrow()
+    # All queries go through DuckDB — federated queries use the attached Trino catalog
+    result = _duckdb.execute(
+        sql,
+        req.params,
+        engine_label=plan.engine.value,
+        tables_accessed=plan.tables_owned + plan.tables_unowned,
+        engine_routed_reason=",".join(r.value for r in plan.reasons),
+    )
+    arrow_table = result.arrow()
 
     duration_ms = (time.monotonic() - start) * 1000
 

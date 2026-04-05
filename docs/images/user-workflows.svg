@@ -115,12 +115,12 @@
   <path d="M350,420 L430,420" fill="none" stroke="#2563eb" stroke-width="3" class="fr" marker-end="url(#ab)"/>
   <text x="390" y="413" font-size="10" font-weight="700" fill="#1e40af">OFFLOAD</text>
 
-  <rect x="430" y="405" width="120" height="50" rx="6" fill="#dbeafe" stroke="#2563eb" stroke-width="2" filter="url(#sh)"/>
-  <text x="490" y="427" text-anchor="middle" font-size="11" font-weight="700" fill="#1e40af">Starburst</text>
-  <text x="490" y="443" text-anchor="middle" font-size="9" fill="#3b82f6">client</text>
+  <rect x="430" y="405" width="120" height="50" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="2" filter="url(#sh)"/>
+  <text x="490" y="427" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">DuckDB</text>
+  <text x="490" y="443" text-anchor="middle" font-size="9" fill="#16a34a">Trino ext.</text>
 
   <path d="M550,420 L640,420" fill="none" stroke="#2563eb" stroke-width="3.5" class="fr" marker-end="url(#ab)"/>
-  <text x="595" y="413" font-size="9" font-weight="600" fill="#1e40af">JWT/TLS</text>
+  <text x="595" y="413" font-size="9" font-weight="600" fill="#1e40af">ATTACH TYPE TRINO</text>
 
   <rect x="640" y="395" width="260" height="70" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2" filter="url(#sh)"/>
   <text x="770" y="420" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">Trino Distributed Workers</text>

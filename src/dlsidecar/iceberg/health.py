@@ -16,10 +16,10 @@ logger = logging.getLogger("dlsidecar.iceberg.health")
 class IcebergHealth:
     """Generates per-table health reports for the /iceberg/health endpoint."""
 
-    def __init__(self, catalog=None, hms_source=None, starburst_source=None):
+    def __init__(self, catalog=None, hms_source=None, duckdb_engine=None):
         self._catalog = catalog
         self._hms = hms_source
-        self._starburst = starburst_source
+        self._duckdb = duckdb_engine
         self._last_compaction: dict[str, str] = {}
         self._last_snapshot_expiry: dict[str, str] = {}
 
@@ -80,11 +80,11 @@ class IcebergHealth:
             if len(parts) == 2:
                 hms_registered = self._hms.table_exists(parts[0], parts[1])
 
-        # Starburst visibility check
+        # Starburst visibility check (via DuckDB's attached Trino catalog)
         starburst_visible = False
-        if self._starburst:
+        if self._duckdb:
             try:
-                result = self._starburst.execute_query(f"DESCRIBE {table_id}")
+                result = self._duckdb.execute_fetchall(f"DESCRIBE starburst.{table_id}")
                 starburst_visible = len(result) > 0
             except Exception:
                 pass

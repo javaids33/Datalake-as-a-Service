@@ -14,7 +14,6 @@ dependencies = [
     "duckdb>=1.1.0",
     "pyarrow>=17.0.0",
     "sqlglot>=25.0.0",
-    "trino>=0.329.0",
     "pyiceberg>=0.7.0",
     "pyhive[hive_pure_sasl]>=0.7.0",
     "thrift>=0.20.0",

@@ -120,41 +120,41 @@ class TestLocalFileOps:
 
 # ── PATH B: Starburst distributed compute ─────────────────────────────────
 
-class TestStarburstCompute:
-    """Starburst handles heavy compute, cross-team queries, large scans."""
+class TestTrinoFederated:
+    """Trino-federated queries: heavy compute, cross-team, large scans (all via DuckDB)."""
 
     def test_cross_team_catalog(self, router):
         plan = router.route("SELECT * FROM other_team.sales.orders")
-        assert plan.engine == Engine.STARBURST
+        assert plan.engine == Engine.TRINO_FEDERATED
         assert RoutingReason.CROSS_TEAM_REF in plan.reasons
-        assert plan.offload_to_starburst is True
+        assert plan.federated is True
 
     def test_unowned_namespace(self, router):
         plan = router.route("SELECT * FROM finance_db.transactions")
-        assert plan.engine == Engine.STARBURST
+        assert plan.engine == Engine.TRINO_FEDERATED
 
     def test_explicit_starburst_hint(self, router):
         plan = router.route("SELECT * FROM mydb.events /*+ ENGINE(starburst) */")
-        assert plan.engine == Engine.STARBURST
+        assert plan.engine == Engine.TRINO_FEDERATED
         assert RoutingReason.EXPLICIT_HINT in plan.reasons
-        assert plan.offload_to_starburst is True
+        assert plan.federated is True
 
     def test_size_threshold_exceeded(self, router):
         plan = router.route(
             "SELECT * FROM mydb.events",
             estimated_bytes=100 * 1024 * 1024 * 1024,
         )
-        assert plan.engine == Engine.STARBURST
+        assert plan.engine == Engine.TRINO_FEDERATED
         assert RoutingReason.SIZE_THRESHOLD in plan.reasons
 
     def test_fully_unowned_join(self, router):
         plan = router.route("SELECT * FROM finance.orders o JOIN hr.employees e ON o.emp_id = e.id")
-        assert plan.engine == Engine.STARBURST
+        assert plan.engine == Engine.TRINO_FEDERATED
 
     def test_heavy_compute_offload_group_by(self, router):
         """Heavy GROUP BY on non-local data → offload to Starburst."""
         plan = router.route("SELECT region, COUNT(*) FROM finance.sales GROUP BY region")
-        assert plan.engine == Engine.STARBURST
+        assert plan.engine == Engine.TRINO_FEDERATED
         assert RoutingReason.HEAVY_COMPUTE in plan.reasons or RoutingReason.CROSS_TEAM_REF in plan.reasons
 
     def test_heavy_compute_offload_window(self, router):
@@ -162,11 +162,11 @@ class TestStarburstCompute:
         plan = router.route(
             "SELECT *, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY ts) FROM finance.events"
         )
-        assert plan.engine == Engine.STARBURST
+        assert plan.engine == Engine.TRINO_FEDERATED
 
     def test_starburst_offload_flag(self, router):
         plan = router.route("SELECT * FROM finance.orders")
-        assert plan.offload_to_starburst is True
+        assert plan.federated is True
 
 
 # ── PATH C: Hybrid (DuckDB orchestrates, Starburst computes) ─────────────
@@ -182,11 +182,11 @@ class TestHybridRouting:
         assert len(plan.tables_owned) > 0
         assert len(plan.tables_unowned) > 0
 
-    def test_hybrid_has_both_sql(self, router):
+    def test_hybrid_has_local_sql(self, router):
         plan = router.route("SELECT * FROM mydb.events e JOIN other_team.data d ON e.id = d.event_id")
         assert plan.engine == Engine.HYBRID
-        assert plan.pushdown_sql is not None
         assert plan.local_sql is not None
+        assert plan.federated is True
 
 
 # ── Hint parsing ──────────────────────────────────────────────────────────
@@ -202,7 +202,7 @@ class TestHintParsing:
 
     def test_engine_hint_case_insensitive(self, router):
         plan = router.route("SELECT * FROM mydb.events /*+ engine(STARBURST) */")
-        assert plan.engine == Engine.STARBURST
+        assert plan.engine == Engine.TRINO_FEDERATED
 
     def test_explicit_duckdb_hint(self, router):
         plan = router.route("SELECT * FROM mydb.events /*+ ENGINE(duckdb) */")

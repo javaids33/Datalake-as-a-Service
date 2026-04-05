@@ -46,3 +46,4 @@ credentials.json
 
 # Build artifacts
 *.whl
+Claude.md

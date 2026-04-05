@@ -184,8 +184,10 @@ Required S3 IAM permissions:
 
     st.divider()
 
-    # Step 2: Starburst
-    st.subheader("2. Connect to Starburst")
+    # Step 2: Starburst (always-on federated catalog)
+    st.subheader("2. Federated Catalog (Starburst)")
+    st.caption("Always connected as DuckDB's primary federated catalog via the Trino extension. "
+               "DuckDB queries Starburst catalogs directly — no separate client.")
     col1, col2 = st.columns([3, 1])
     with col1:
         cfg["starburst_host"] = st.text_input("Starburst Host", value=cfg["starburst_host"], placeholder="starburst.internal.firm.com")
@@ -257,8 +259,10 @@ glue:UpdateTable, glue:GetPartitions, glue:DeleteTable""", language="text")
 
     st.divider()
 
-    # Step 5: Additional sources
-    st.subheader("5. Additional sources")
+    # Step 5: Additional DuckDB-connected sources
+    st.subheader("5. Additional DuckDB-connected sources")
+    st.caption("Connect via DuckDB's native extensions — no separate clients. "
+               "Each source attaches as a DuckDB catalog (ATTACH ... TYPE POSTGRES, etc.).")
     col1, col2, col3 = st.columns(3)
     with col1:
         cfg["snowflake_enabled"] = st.checkbox("Snowflake", value=cfg["snowflake_enabled"])
@@ -422,7 +426,7 @@ elif page == "Query Console":
         result = api_post("/api/onboarding/explain", {"sql": sql})
         if result and "error" not in result:
             engine = result.get("engine", "unknown")
-            badge_color = {"duckdb": "green", "starburst": "blue", "hybrid": "violet"}.get(engine, "gray")
+            badge_color = {"duckdb": "green", "trino_federated": "blue", "hybrid": "violet"}.get(engine, "gray")
             st.markdown(f"**Routing:** :{badge_color}[{engine.upper()}] -- {result.get('routing_reason', '')}")
             if result.get("tables_owned"):
                 st.write(f"**Owned tables:** {', '.join(result['tables_owned'])}")
@@ -435,7 +439,7 @@ elif page == "Query Console":
         result = api_post("/query", {"sql": sql, "format": "json"})
         if result and "error" not in result:
             engine = result.get("engine", "unknown")
-            badge_color = {"duckdb": "green", "starburst": "blue", "hybrid": "violet"}.get(engine, "gray")
+            badge_color = {"duckdb": "green", "trino_federated": "blue", "hybrid": "violet"}.get(engine, "gray")
             st.markdown(
                 f":{badge_color}[{engine.upper()}] -- "
                 f"{result.get('row_count', 0)} rows, {result.get('duration_ms', 0):.1f}ms"
