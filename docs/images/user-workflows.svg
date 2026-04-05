@@ -96,24 +96,24 @@
   <text x="1050" y="298" text-anchor="middle" font-size="10" fill="#3b82f6">All teams can query via federation</text>
 
   <!-- ══════════════════════════════════════════════════════════════════ -->
-  <!-- WORKFLOW 3: Heavy analytics offloaded to Trino -->
+  <!-- WORKFLOW 3: Query targets Starburst catalog data → federated -->
   <!-- ══════════════════════════════════════════════════════════════════ -->
   <rect x="20" y="350" width="1160" height="155" rx="10" fill="#eff6ff" stroke="#93c5fd" stroke-width="1.5"/>
-  <text x="40" y="372" font-size="13" font-weight="700" fill="#1e40af">Workflow 3: Heavy analytics query offloaded to Starburst/Trino</text>
-  <text x="40" y="388" font-size="11" fill="#3b82f6">GROUP BY on 500GB table. DuckDB is too lightweight for this. Router offloads to Trino's distributed workers.</text>
+  <text x="40" y="372" font-size="13" font-weight="700" fill="#1e40af">Workflow 3: Query targets data in Starburst catalogs — federated through Trino</text>
+  <text x="40" y="388" font-size="11" fill="#3b82f6">Data lives in another team's catalog or an external JDBC source. Router sends it to Starburst. Other teams can see what is queried.</text>
 
   <rect x="50" y="405" width="100" height="50" rx="6" fill="#f8fafc" stroke="#e2e8f0" filter="url(#sh)"/>
   <text x="100" y="427" text-anchor="middle" font-size="11" font-weight="600" fill="#334155">Analyst</text>
-  <text x="100" y="443" text-anchor="middle" font-size="9" fill="#94a3b8">GROUP BY</text>
+  <text x="100" y="443" text-anchor="middle" font-size="9" fill="#94a3b8">SELECT FROM ...</text>
 
   <path d="M150,430 L210,430" fill="none" stroke="#64748b" stroke-width="1.5" class="fr"/>
 
   <rect x="210" y="405" width="140" height="50" rx="6" fill="#ede9fe" stroke="#a78bfa" filter="url(#sh)"/>
   <text x="280" y="427" text-anchor="middle" font-size="11" font-weight="600" fill="#5b21b6">Query Router</text>
-  <text x="280" y="443" text-anchor="middle" font-size="9" fill="#7c3aed">heavy compute detected</text>
+  <text x="280" y="443" text-anchor="middle" font-size="9" fill="#7c3aed">Starburst catalog data</text>
 
   <path d="M350,420 L430,420" fill="none" stroke="#2563eb" stroke-width="3" class="fr" marker-end="url(#ab)"/>
-  <text x="390" y="413" font-size="10" font-weight="700" fill="#1e40af">OFFLOAD</text>
+  <text x="390" y="413" font-size="10" font-weight="700" fill="#1e40af">FEDERATE</text>
 
   <rect x="430" y="405" width="120" height="50" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="2" filter="url(#sh)"/>
   <text x="490" y="427" text-anchor="middle" font-size="11" font-weight="700" fill="#15803d">DuckDB</text>
@@ -123,9 +123,9 @@
   <text x="595" y="413" font-size="9" font-weight="600" fill="#1e40af">ATTACH TYPE TRINO</text>
 
   <rect x="640" y="395" width="260" height="70" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2" filter="url(#sh)"/>
-  <text x="770" y="420" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">Trino Distributed Workers</text>
-  <text x="770" y="438" text-anchor="middle" font-size="10" fill="#3b82f6">Scan 500GB across 10 workers in parallel</text>
-  <text x="770" y="453" text-anchor="middle" font-size="10" fill="#3b82f6">Aggregate, join, compute at cluster scale</text>
+  <text x="770" y="418" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">Starburst Federation</text>
+  <text x="770" y="436" text-anchor="middle" font-size="10" fill="#3b82f6">Resolves data from other team catalogs,</text>
+  <text x="770" y="451" text-anchor="middle" font-size="10" fill="#3b82f6">JDBC sources, external lakes — governed + audited</text>
 
   <path d="M640,445 L550,445" fill="none" stroke="#2563eb" stroke-width="2.5" class="fl" marker-end="url(#ab)"/>
   <text x="595" y="460" font-size="9" font-weight="600" fill="#1e40af">results</text>
@@ -135,7 +135,7 @@
 
   <rect x="940" y="405" width="220" height="50" rx="6" fill="#fef3c7" stroke="#fcd34d"/>
   <text x="1050" y="427" text-anchor="middle" font-size="11" font-weight="600" fill="#854d0e">DuckDB caches result locally</text>
-  <text x="1050" y="443" text-anchor="middle" font-size="10" fill="#92400e">Next identical query: instant from cache</text>
+  <text x="1050" y="443" text-anchor="middle" font-size="10" fill="#92400e">Audit log: who queried what</text>
 
   <!-- ══════════════════════════════════════════════════════════════════ -->
   <!-- WORKFLOW 4: Streaming ingest from Kafka -->
@@ -176,6 +176,6 @@
 
   <!-- Bottom legend -->
   <rect x="20" y="655" width="1160" height="55" rx="8" fill="#f1f5f9"/>
-  <text x="40" y="678" font-size="12" font-weight="700" fill="#334155">Why Trino for heavy compute?</text>
-  <text x="40" y="698" font-size="11" fill="#64748b">Trino distributes work across multiple workers in parallel. A 500GB GROUP BY that would OOMKill DuckDB (4GB memory) completes in seconds on a 10-worker Trino cluster.</text>
+  <text x="40" y="678" font-size="12" font-weight="700" fill="#334155">Why federate through Starburst?</text>
+  <text x="40" y="698" font-size="11" fill="#64748b">Data in Starburst catalogs is governed. Other teams can see what is being queried via audit logs. Starburst handles distributed compute across workers for the data it manages.</text>
 </svg>

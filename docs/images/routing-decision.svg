@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 700" font-family="Inter, -apple-system, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 950 550" font-family="Inter, -apple-system, sans-serif">
   <defs>
     <style>
       @keyframes flow { from { stroke-dashoffset: 16; } to { stroke-dashoffset: 0; } }
@@ -7,7 +7,7 @@
     <filter id="s"><feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.12"/></filter>
   </defs>
 
-  <rect width="950" height="700" fill="#fafbfc" rx="10"/>
+  <rect width="950" height="550" fill="#fafbfc" rx="10"/>
   <text x="475" y="32" text-anchor="middle" font-size="18" font-weight="700" fill="#0f172a">Query Routing Decision</text>
   <text x="475" y="52" text-anchor="middle" font-size="12" fill="#64748b">Own catalog = DuckDB direct to S3. Other datasources = Starburst federation.</text>
 
@@ -41,58 +41,37 @@
   <text x="795" y="290" text-anchor="middle" font-size="10" fill="#16a34a">httpfs + IRSA to team S3 bucket</text>
   <line x1="585" y1="275" x2="690" y2="275" stroke="#16a34a" stroke-width="2.5" class="anim"/>
 
-  <!-- D3: Heavy compute on own data? -->
-  <polygon points="475,340 585,380 475,420 365,380" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5" filter="url(#s)"/>
-  <text x="475" y="373" text-anchor="middle" font-size="10" font-weight="600" fill="#92400e">Heavy compute?</text>
-  <text x="475" y="388" text-anchor="middle" font-size="9" fill="#92400e">GROUP BY / WINDOW / > 50GB</text>
-  <text x="600" y="373" font-size="10" fill="#2563eb" font-weight="700">offload</text>
-  <text x="340" y="373" font-size="10" fill="#64748b" font-weight="600">no</text>
+  <!-- D3: Query targets Starburst catalog data? -->
+  <polygon points="475,340 595,380 475,420 355,380" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5" filter="url(#s)"/>
+  <text x="475" y="370" text-anchor="middle" font-size="10" font-weight="600" fill="#92400e">Query targets data</text>
+  <text x="475" y="384" text-anchor="middle" font-size="10" font-weight="600" fill="#92400e">in Starburst catalogs?</text>
+  <text x="475" y="398" text-anchor="middle" font-size="8" fill="#92400e">other teams, JDBC sources, etc.</text>
+  <text x="610" y="373" font-size="10" fill="#2563eb" font-weight="700">yes</text>
+  <text x="330" y="373" font-size="10" fill="#64748b" font-weight="600">no</text>
   <line x1="475" y1="315" x2="475" y2="340" stroke="#64748b" stroke-width="1.5"/>
 
   <rect x="690" y="355" width="210" height="55" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2" filter="url(#s)"/>
   <text x="795" y="377" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">STARBURST</text>
-  <text x="795" y="394" text-anchor="middle" font-size="10" fill="#3b82f6">via DuckDB Trino extension</text>
-  <text x="795" y="406" text-anchor="middle" font-size="9" fill="#3b82f6">distributed workers do the compute</text>
-  <line x1="585" y1="380" x2="690" y2="380" stroke="#2563eb" stroke-width="2.5" class="anim"/>
+  <text x="795" y="394" text-anchor="middle" font-size="10" fill="#3b82f6">federated via Trino extension</text>
+  <text x="795" y="406" text-anchor="middle" font-size="9" fill="#3b82f6">other teams see what you query</text>
+  <line x1="595" y1="380" x2="690" y2="380" stroke="#2563eb" stroke-width="2.5" class="anim"/>
 
-  <!-- D4: References other datasources? -->
-  <polygon points="475,445 595,490 475,535 355,490" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5" filter="url(#s)"/>
-  <text x="475" y="480" text-anchor="middle" font-size="10" font-weight="600" fill="#92400e">References other</text>
-  <text x="475" y="495" text-anchor="middle" font-size="10" font-weight="600" fill="#92400e">datasources?</text>
-  <text x="475" y="510" text-anchor="middle" font-size="8" fill="#92400e">cross-team, JDBC, external</text>
-  <text x="612" y="478" font-size="10" fill="#2563eb" font-weight="600">yes (all)</text>
-  <text x="612" y="498" font-size="10" fill="#7c3aed" font-weight="600">mixed</text>
-  <text x="328" y="485" font-size="10" fill="#16a34a" font-weight="600">owned only</text>
-  <line x1="475" y1="420" x2="475" y2="445" stroke="#64748b" stroke-width="1.5"/>
-
-  <!-- All other → Starburst federated -->
-  <rect x="690" y="458" width="210" height="48" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2" filter="url(#s)"/>
-  <text x="795" y="480" text-anchor="middle" font-size="12" font-weight="700" fill="#1e40af">STARBURST</text>
-  <text x="795" y="496" text-anchor="middle" font-size="10" fill="#3b82f6">federation for other sources</text>
-  <line x1="595" y1="478" x2="690" y2="478" stroke="#2563eb" stroke-width="2" class="anim"/>
-
-  <!-- Mixed → Hybrid -->
-  <rect x="690" y="520" width="210" height="48" rx="8" fill="#ede9fe" stroke="#7c3aed" stroke-width="2" filter="url(#s)"/>
-  <text x="795" y="542" text-anchor="middle" font-size="12" font-weight="700" fill="#5b21b6">HYBRID</text>
-  <text x="795" y="558" text-anchor="middle" font-size="10" fill="#7c3aed">own S3 direct + Starburst merged</text>
-  <line x1="595" y1="498" x2="690" y2="545" stroke="#7c3aed" stroke-width="2" class="anim"/>
-
-  <!-- Owned only → DuckDB direct -->
-  <rect x="50" y="465" width="210" height="48" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2" filter="url(#s)"/>
-  <text x="155" y="487" text-anchor="middle" font-size="12" font-weight="700" fill="#15803d">DUCKDB DIRECT</text>
-  <text x="155" y="503" text-anchor="middle" font-size="10" fill="#16a34a">httpfs to own S3, no Starburst</text>
-  <line x1="355" y1="490" x2="260" y2="490" stroke="#16a34a" stroke-width="2" class="anim"/>
+  <!-- D3 "no" fallback: all owned data → DuckDB direct -->
+  <rect x="50" y="360" width="210" height="48" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2" filter="url(#s)"/>
+  <text x="155" y="382" text-anchor="middle" font-size="12" font-weight="700" fill="#15803d">DUCKDB DIRECT</text>
+  <text x="155" y="398" text-anchor="middle" font-size="10" fill="#16a34a">httpfs to own S3, no Starburst</text>
+  <line x1="355" y1="380" x2="260" y2="380" stroke="#16a34a" stroke-width="2" class="anim"/>
 
   <!-- Summary boxes -->
-  <rect x="30" y="590" width="420" height="90" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
-  <text x="240" y="615" text-anchor="middle" font-size="13" font-weight="700" fill="#15803d">Own Catalog Path (green)</text>
-  <text x="240" y="635" text-anchor="middle" font-size="11" fill="#334155">DuckDB reads the team's S3 bucket directly</text>
-  <text x="240" y="652" text-anchor="middle" font-size="11" fill="#334155">via httpfs + IRSA. No Starburst hop. Fast.</text>
-  <text x="240" y="669" text-anchor="middle" font-size="10" fill="#16a34a">Includes: Iceberg tables, Parquet files in team bucket</text>
+  <rect x="30" y="440" width="420" height="90" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  <text x="240" y="465" text-anchor="middle" font-size="13" font-weight="700" fill="#15803d">Own Catalog Path (green)</text>
+  <text x="240" y="485" text-anchor="middle" font-size="11" fill="#334155">Query targets team's own S3 bucket data.</text>
+  <text x="240" y="502" text-anchor="middle" font-size="11" fill="#334155">DuckDB reads directly via httpfs + IRSA. Fast.</text>
+  <text x="240" y="519" text-anchor="middle" font-size="10" fill="#16a34a">Includes: Iceberg tables, Parquet files in team bucket</text>
 
-  <rect x="500" y="590" width="420" height="90" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
-  <text x="710" y="615" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">Federation Path (blue)</text>
-  <text x="710" y="635" text-anchor="middle" font-size="11" fill="#334155">DuckDB sends query to Starburst via Trino ext.</text>
-  <text x="710" y="652" text-anchor="middle" font-size="11" fill="#334155">Starburst federates across all available catalogs.</text>
-  <text x="710" y="669" text-anchor="middle" font-size="10" fill="#2563eb">Includes: other teams, JDBC, external lakes, heavy compute</text>
+  <rect x="500" y="440" width="420" height="90" rx="10" fill="#dbeafe" stroke="#2563eb" stroke-width="1"/>
+  <text x="710" y="465" text-anchor="middle" font-size="13" font-weight="700" fill="#1e40af">Starburst Federation Path (blue)</text>
+  <text x="710" y="485" text-anchor="middle" font-size="11" fill="#334155">Query targets data offered through Starburst catalogs.</text>
+  <text x="710" y="502" text-anchor="middle" font-size="11" fill="#334155">Starburst federates. Other teams can see what is queried.</text>
+  <text x="710" y="519" text-anchor="middle" font-size="10" fill="#2563eb">Includes: other teams' data, JDBC sources, external lakes</text>
 </svg>
