@@ -86,7 +86,7 @@ class DuckDBEngine:
         engine_label: str = "duckdb",
         tables_accessed: list[str] | None = None,
         engine_routed_reason: str | None = None,
-    ) -> duckdb.DuckDBPyRelation:
+    ) -> duckdb.DuckDBPyConnection:
         """Execute SQL with thread safety, audit logging, and metrics."""
         with self._lock:
             with audit_query(
@@ -119,13 +119,13 @@ class DuckDBEngine:
         engine_routed_reason: str | None = None,
     ) -> pa.Table:
         """Execute SQL and return results as an Arrow table."""
-        rel = self.execute(
+        result = self.execute(
             sql,
             params,
             tables_accessed=tables_accessed,
             engine_routed_reason=engine_routed_reason,
         )
-        return rel.arrow()
+        return result.fetch_arrow_table()
 
     def execute_fetchall(
         self,

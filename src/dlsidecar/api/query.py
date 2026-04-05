@@ -81,7 +81,7 @@ async def query(req: QueryRequest, request: Request):
         tables_accessed=plan.tables_owned + plan.tables_unowned,
         engine_routed_reason=",".join(r.value for r in plan.reasons),
     )
-    arrow_table = result.arrow()
+    arrow_table = result.fetch_arrow_table()
 
     duration_ms = (time.monotonic() - start) * 1000
 
@@ -145,7 +145,7 @@ async def query_stream(sql: str = Query(...), format: str = Query("json")):
         async def generate():
             result = _duckdb.execute(effective_sql, tables_accessed=plan.tables_owned)
             batch_size = 1000
-            arrow = result.arrow()
+            arrow = result.fetch_arrow_table()
             for i in range(0, len(arrow), batch_size):
                 chunk = arrow.slice(i, batch_size)
                 data = json.dumps(chunk.to_pydict(), default=str)
@@ -157,7 +157,7 @@ async def query_stream(sql: str = Query(...), format: str = Query("json")):
 
         async def generate_arrow():
             result = _duckdb.execute(effective_sql, tables_accessed=plan.tables_owned)
-            arrow = result.arrow()
+            arrow = result.fetch_arrow_table()
             sink = pa.BufferOutputStream()
             writer = pa.ipc.new_stream(sink, arrow.schema)
             batch_size = 10000
@@ -185,7 +185,7 @@ async def query_async(req: QueryRequest):
                 sql = _row_filter.inject(sql)
 
             result = _duckdb.execute(sql, req.params, tables_accessed=plan.tables_owned)
-            arrow = result.arrow()
+            arrow = result.fetch_arrow_table()
             columns = arrow.column_names
             rows_dict = arrow.to_pydict()
             row_list = []
